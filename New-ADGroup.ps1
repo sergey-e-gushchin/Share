@@ -19,6 +19,8 @@
             -GroupScope Global `
             -path ( $OUDistinguishedName ) `
             -SamAccountName "Персонал $(Get-ITGOUsamAccountNameSuffix $OUDistinguishedName)" `
+            -DisplayName 'Персонал' `
+            -Description "Персонал отдела $(Get-ITGGroupDescription $OUDistinguishedName)" `
             -WhatIf:$WhatIfPreference `
 			-Verbose:$VerbosePreference `
         ;
@@ -59,4 +61,20 @@ Function Get-ITGOUsamAccountNameSuffix {
     }
 } 
 
-# Get-ADOrganizationalUnit -SearchBase 'OU=ФБУ \"Тест-С.-Петербург\",DC=test-csm,DC=nov,DC=ru' -SearchScope Subtree -Filter '*' | New-ITGPersonalGroup -Verbose -WhatIf
+Function Get-ITGGroupDescription {
+    param (
+        [parameter(
+            Mandatory = $true
+            , ValueFromPipeline = $true
+            , ValueFromPipelineByPropertyName = $true
+        )]
+        $OUName
+        )
+        process {
+        $name = Get-ADOrganizationalUnit `
+              -Identity $OUName
+              ;
+        $Description = $Name.name;
+        return $Description;
+    }
+}
